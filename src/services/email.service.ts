@@ -1,9 +1,11 @@
-import nodemailer, { Transporter } from "nodemailer";
+import nodemailer from "nodemailer";
+
 import hbs from "nodemailer-express-handlebars";
-import path from "path";
+import  path from "path";
 import { EEmailAction } from "../enums/email-action.enum";
 import { emailTemplates } from "../constants/mail.constant";
-import { configs } from "../configs/configs";
+import {Transporter} from "nodemailer";
+
 
 class EmailService {
     private transporter: Transporter;
@@ -38,7 +40,6 @@ class EmailService {
         context: Record<string, string | number> = {},
     ) {
         const { subject, templateName } = emailTemplates[emailAction];
-        context.frontUrl = configs.FRONT_URL;
 
         const mailOptions = {
             to: email,

@@ -1,20 +1,18 @@
-import { Types } from "mongoose";
 
-import { EEmailAction } from "../enums/email-action.enum";
 import { ERole } from "../enums/role.enum";
 import { ApiError } from "../errors/api.error";
 
 import { ILogin } from "../types/auth.type";
 import { IUser } from "../types/user.type";
-import { emailService } from "./email.service";
+
 
 import { ITokenPayload, ITokensPair } from "../types/token.type";
 import { tokenService } from "./token.service";
-import { EActionTokenType } from "../enums/token-type";
 
-import {IChangePassword} from "../types/auth.type";
+
+import { passwordService } from "./password.service";
+
 import {userRepository} from "../repositore/user.repository";
-import {passwordService} from "./password.service";
 import {tokenRepository} from "../repositore/token.repository";
 
 class AuthService {
@@ -36,7 +34,7 @@ class AuthService {
     }
 
     public async signInAdmin(dto: ILogin): Promise<ITokensPair> {
-        const user = await userRepository.getOneByParams({
+        const user:any = await userRepository.getOneByParams({
             email: dto.email,
             role: ERole.ADMIN,
         });
@@ -72,23 +70,7 @@ class AuthService {
             password: hashedPassword,
         });
 
-        const actionToken = tokenService.createActionToken(
-            { userId: user._id, role: ERole.USER },
-            EActionTokenType.ACTIVATE,
-        );
 
-
-        await Promise.all([
-            tokenRepository.createActionToken({
-                actionToken,
-                _userId: user._id,
-                tokenType: EActionTokenType.ACTIVATE,
-            }),
-            emailService.sendMail(dto.email, EEmailAction.WELCOME, {
-                name: dto.name,
-                actionToken,
-            }),
-        ]);
         return user
     }
 
@@ -99,15 +81,11 @@ class AuthService {
         const isMatch = await passwordService.compare(dto.password, user.password);
         if (!isMatch) throw new ApiError("Not valid email or password", 401);
 
-        if (!user.isVerified) {
-            throw new ApiError("Verify your account", 403);
-        }
-
         const jwtTokens = tokenService.generateTokenPair(
-            { userId: user._id, role: ERole.USER },
+            { userId: user._id.toString(), role: ERole.USER },
             ERole.USER,
         );
-        await tokenRepository.create({ ...jwtTokens, _userId: user._id });
+        await tokenRepository.create({ ...jwtTokens, _userId: user._id.toString() });
 
         return jwtTokens;
     }
@@ -116,7 +94,7 @@ class AuthService {
         jwtPayload: ITokenPayload,
         refreshToken: string,
     ): Promise<ITokensPair> {
-        const user = await userRepository.getById(jwtPayload.userId);
+        const user = await userRepository.getById(jwtPayload.userId.toString());
         await tokenRepository.deleteOneByParams({ refreshToken });
 
         const jwtTokens = tokenService.generateTokenPair(
@@ -128,87 +106,10 @@ class AuthService {
         );
         await tokenRepository.create({
             ...jwtTokens,
-            _userId: new Types.ObjectId(jwtPayload.userId),
+            _userId:jwtPayload.userId
         });
 
         return jwtTokens;
-    }
-
-    public async forgotPassword(user: IUser) {
-        const actionToken = tokenService.createActionToken(
-            { userId: user._id, role: ERole.USER },
-            EActionTokenType.FORGOT,
-        );
-
-        await Promise.all([
-            tokenRepository.createActionToken({
-                actionToken,
-                _userId: user._id,
-                tokenType: EActionTokenType.FORGOT,
-            }),
-            emailService.sendMail(user.email, EEmailAction.FORGOT_PASSWORD, {
-                actionToken,
-            }),
-        ]);
-    }
-
-    public async setForgotPassword(password: string, actionToken: string) {
-        const payload = tokenService.checkActionToken(
-            actionToken,
-            EActionTokenType.FORGOT,
-        );
-        const entity = await tokenRepository.getActionTokenByParams({
-            actionToken,
-        });
-        if (!entity) {
-            throw new ApiError("Not valid token", 400);
-        }
-        const newHashedPassword = await passwordService.hash(password);
-        await Promise.all([
-            userRepository.updateById(payload.userId, {
-                password: newHashedPassword,
-            }),
-            tokenRepository.deleteActionTokenByParams({ actionToken }),
-        ]);
-    }
-
-    public async verify(actionToken: string) {
-        const payload = tokenService.checkActionToken(
-            actionToken,
-            EActionTokenType.ACTIVATE,
-        );
-        const entity = await tokenRepository.getActionTokenByParams({
-            actionToken,
-        });
-        if (!entity) {
-            throw new ApiError("Not valid token", 400);
-        }
-
-        await Promise.all([
-            userRepository.updateById(payload.userId, {
-                isVerified: true,
-            }),
-            tokenRepository.deleteActionTokenByParams({ actionToken }),
-        ]);
-    }
-
-    public async changePassword(dto: IChangePassword, jwtPayload: ITokenPayload) {
-        const user = await userRepository.getById(jwtPayload.userId);
-        if (!user) {
-            throw new ApiError("User not found", 404);
-        }
-
-        const isMatch = await passwordService.compare(
-            dto.oldPassword,
-            user.password,
-        );
-        if (!isMatch) {
-            throw new ApiError("Old password is invalid", 400);
-        }
-
-        const hashedNewPassword = await passwordService.hash(dto.newPassword);
-
-        await userRepository.updateById(user._id, { password: hashedNewPassword });
     }
 }
 

@@ -1,11 +1,14 @@
 import { CronJob } from "cron";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
+
 
 import { EEmailAction } from "../enums/email-action.enum";
 import { ApiError } from "../errors/api.error";
 import { emailService } from "../services/email.service";
-import { userRepository } from "../repositores/user.repository";
+import {userRepository} from "../repositore/user.repository";
+import utc from "dayjs/plugin/utc";
+
+
 
 dayjs.extend(utc);
 

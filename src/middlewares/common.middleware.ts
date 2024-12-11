@@ -1,38 +1,30 @@
 import { NextFunction, Request, Response } from "express";
-
-import { ERole } from "../enums/role.enum";
+import { isObjectIdOrHexString } from "mongoose";
+import { ObjectSchema } from "joi";
 import { ApiError } from "../errors/api.error";
 
-import { IUser } from "../types/user.type";
-import {userRepository} from "../repositore/user.repository";
+class CommonMiddleware {
+    public isIdValid(req: Request, res: Response, next: NextFunction) {
+        try {
+            const id = req.params.id;
 
-class UserMiddleware {
-    public haveAccessByRole(...roles: ERole[]) {
+            if (!isObjectIdOrHexString(id)) {
+                throw new Error("wrong ID param");
+            }
+
+            next();
+        } catch (e) {
+            next(e);
+        }
+    }
+    public isBodyValid(validator: ObjectSchema) {
         return function (req: Request, res: Response, next: NextFunction) {
             try {
-                const payload = req.res.locals.jwtPayload;
-                if (!roles.includes(payload?.role)) {
-                    throw new ApiError("Access denied", 403);
+                const { error, value } = validator.validate(req.body);
+                if(error){
+                    throw new ApiError(error.details[0].message, 400);
                 }
-                next();
-            } catch (e) {
-                next(e);
-            }
-        };
-    }
-
-    public isUserExist(field: keyof IUser) {
-        return async (req: Request, res: Response, next: NextFunction) => {
-            try {
-                const user = await userRepository.getOneByParams({
-                    [field]: req.body[field],
-                });
-
-                if (!user) {
-                    throw new ApiError("User not found", 404);
-                }
-
-                req.res.locals = user;
+                req.body = value;
 
                 next();
             } catch (e) {
@@ -42,4 +34,4 @@ class UserMiddleware {
     }
 }
 
-export const userMiddleware = new UserMiddleware();
+export const commonMiddleware = new CommonMiddleware();

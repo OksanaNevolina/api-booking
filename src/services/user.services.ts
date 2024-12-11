@@ -6,7 +6,7 @@ import { ITokenPayload } from "../types/token.type";
 
 import { IQuery } from "../types/pagination.type";
 
-import { EFileType } from "../enums/file-type";
+
 import {userRepository} from "../repositore/user.repository";
 import {tokenRepository} from "../repositore/token.repository";
 
@@ -35,7 +35,7 @@ class UserService {
     }
 
     public async getMe(jwtPayload: ITokenPayload): Promise<IUser> {
-        const user = await userRepository.getById(jwtPayload.userId);
+        const user = await userRepository.getById(jwtPayload.userId.toString());
         if (!user) {
             throw new ApiError("You cant get this user", 403);
         }
@@ -46,21 +46,21 @@ class UserService {
         jwtPayload: ITokenPayload,
         body: Partial<IUser>,
     ): Promise<IUser> {
-        const user = await userRepository.getById(jwtPayload.userId);
+        const user = await userRepository.getById(jwtPayload.userId.toString());
         if (!user) {
             throw new ApiError("User not found", 403);
         }
-        return await userRepository.updateById(jwtPayload.userId, body);
+        return await userRepository.updateById(jwtPayload.userId.toString(), body);
     }
 
     public async deleteMe(jwtPayload: ITokenPayload): Promise<void> {
-        const user = await userRepository.getById(jwtPayload.userId);
+        const user = await userRepository.getById(jwtPayload.userId.toString());
         if (!user) {
             throw new ApiError("User not found", 403);
         }
         await Promise.all([
-            userRepository.deleteById(jwtPayload.userId),
-            tokenRepository.deleteManyBy(jwtPayload.userId),
+            userRepository.deleteById(jwtPayload.userId.toString()),
+            tokenRepository.deleteManyBy(jwtPayload.userId.toString()),
         ]);
     }
 

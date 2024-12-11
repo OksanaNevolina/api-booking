@@ -15,28 +15,14 @@ const userSchema = new Schema(
             lowercase: true,
             required: true,
         },
-        age: {
-            type: Number,
-            min: 1,
-            max: 55,
-            required: true,
-        },
         role: {
             type: String,
             enum: ERole,
             default: ERole.USER,
         },
-        isVerified: {
-            type: Boolean,
-            default: false,
-        },
         password: {
             type: String,
             required: true,
-        },
-        avatar: {
-            type: String,
-            default: null,
         },
     },
     {

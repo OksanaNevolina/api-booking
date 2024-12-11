@@ -16,7 +16,7 @@ export interface ITokensPair {
 }
 
 export interface IToken extends ITokensPair {
-    _userId: Types.ObjectId;
+    _userId: string;
 }
 
 export interface IActionToken {
