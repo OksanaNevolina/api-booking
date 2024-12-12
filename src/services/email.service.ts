@@ -15,8 +15,8 @@ class EmailService {
             service: "gmail",
             from: "No reply",
             auth: {
-                user: "onevolina5@gmail.com",
-                pass: "eohdbdkkzqkkvebf",
+                user: "sana.dev.n@gmail.com",
+                pass: "myfvukdibdemfujw",
             },
         });
 

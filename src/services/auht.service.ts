@@ -14,6 +14,8 @@ import { passwordService } from "./password.service";
 
 import {userRepository} from "../repositore/user.repository";
 import {tokenRepository} from "../repositore/token.repository";
+import {emailService} from "./email.service";
+import {EEmailAction} from "../enums/email-action.enum";
 
 class AuthService {
     public async signUpAdmin(dto: Partial<IUser>): Promise<IUser> {
@@ -25,6 +27,7 @@ class AuthService {
         }
 
         const hashedPassword = await passwordService.hash(dto.password);
+
 
         return await userRepository.create({
             ...dto,
@@ -65,13 +68,21 @@ class AuthService {
         }
 
         const hashedPassword = await passwordService.hash(dto.password);
-        const user = await userRepository.create({
+        const createdUser = await userRepository.create({
             ...dto,
             password: hashedPassword,
+            role: ERole.USER,
         });
 
+        try {
+            await emailService.sendMail(dto.email, EEmailAction.WELCOME, {
+                name: dto.name || 'наш новий користувач',
+            });
+        } catch (error) {
+            console.error(`Failed to send welcome email to ${dto.email}:`, error);
+        }
 
-        return user
+        return createdUser;
     }
 
     public async signIn(dto: ILogin): Promise<ITokensPair> {
