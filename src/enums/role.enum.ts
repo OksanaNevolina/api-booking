@@ -1,4 +1,4 @@
 export enum ERole {
-    ADMIN = "admin",
-    USER = "user",
+  ADMIN = "admin",
+  USER = "user",
 }

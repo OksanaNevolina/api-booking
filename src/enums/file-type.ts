@@ -1,3 +1,3 @@
 export enum EFileType {
-    User = "user",
+  User = "user",
 }

@@ -1,5 +1,3 @@
 export enum EEmailAction {
-    WELCOME,
-
-
+  WELCOME,
 }

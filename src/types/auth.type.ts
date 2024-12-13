@@ -1,10 +1,7 @@
 export interface IEmail {
-    email: string;
+  email: string;
 }
 
 export interface ILogin extends IEmail {
-    password: string;
+  password: string;
 }
-
-
-

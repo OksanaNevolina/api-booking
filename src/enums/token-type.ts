@@ -1,4 +1,4 @@
-export enum   ETokenType {
-    ACCESS = "access",
-    REFRESH = "refresh",
+export enum ETokenType {
+  ACCESS = "access",
+  REFRESH = "refresh",
 }
