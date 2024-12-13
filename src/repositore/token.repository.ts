@@ -1,6 +1,6 @@
 import { IToken } from "../types/token.type";
 import { Token } from "../models/token.model";
-import { FilterQuery } from "mongoose";
+
 
 class TokenRepository {
     public async create(data: Partial<IToken>) {
@@ -18,9 +18,7 @@ class TokenRepository {
     public async deleteOneByParams(params: Partial<IToken>): Promise<void> {
         await Token.deleteOne(params);
     }
-    public async deleteManyByParams(params: FilterQuery<IToken>): Promise<void> {
-        await Token.deleteMany(params);
-    }
+
 
 
 }

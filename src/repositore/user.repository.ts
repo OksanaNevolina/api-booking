@@ -7,15 +7,15 @@ import { IPaginationResponse, IQuery } from "../types/pagination.type";
 
 class UserRepository {
     public async getAll(): Promise<IUser[]> {
-        return await User.find({});
+        return  User.find({});
     }
 
     public async getById(id: string): Promise<IUser> {
-        return await User.findOne({ _id: id });
+        return  User.findOne({ _id: id });
     }
 
     public async getOneByParams(params: FilterQuery<IUser>): Promise<IUser> {
-        return await User.findOne(params);
+        return  User.findOne(params);
     }
 
     public async updateById(id: string, body: Partial<IUser>): Promise<IUser> {

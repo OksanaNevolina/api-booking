@@ -5,8 +5,8 @@ import {configs} from "./configs/configs";
 import { ApiError } from "./errors/api.error";
 import { authRouter } from "./routers/auth.router";
 import { userRouter } from "./routers/user.router";
-import {adminRouter} from "./routers/admin.router";
-// import {runAllCronJobs} from "./crons";
+import {bookingRouter} from "./routers/bookingRouter";
+
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -16,8 +16,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/auth", authRouter);
-app.use("/admin", adminRouter);
 app.use("/users", userRouter);
+app.use("/bookings", bookingRouter);
+
 
 const errorHandler: ErrorRequestHandler = (
     err: ApiError,
