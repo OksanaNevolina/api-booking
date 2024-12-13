@@ -8,7 +8,7 @@ import { commonMiddleware } from "../middlewares/common.middleware";
 
 const router = Router();
 
-// router.get("/", userController.getAllPaginated);
+
 
 router.get(
   "/me",
