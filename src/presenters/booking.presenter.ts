@@ -8,6 +8,7 @@ export class BookingPresenter {
       date: booking.date,
       startTime: booking.startTime,
       endTime: booking.endTime,
+      createdBy: booking.createdBy,
       createdAt: booking.createdAt,
       updatedAt: booking.updatedAt,
     };

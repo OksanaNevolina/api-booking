@@ -8,3 +8,6 @@ export interface IUser extends Document {
   role: ERole;
   createdAt: Date;
 }
+export interface IUserRes extends IUser {
+  id: string;
+}

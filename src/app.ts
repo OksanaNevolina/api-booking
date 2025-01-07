@@ -14,12 +14,21 @@ import { userRouter } from "./routers/user.router";
 import { bookingRouter } from "./routers/bookingRouter";
 import yaml from "yamljs";
 import  path from "path";
+import cors from 'cors';
+
 
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 const swaggerDocument = yaml.load(path.join(__dirname, 'swagger.yaml'));
 
 const app = express();
+
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

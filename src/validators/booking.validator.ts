@@ -21,17 +21,29 @@ export class BookingValidator {
       "string.pattern.base": "Time must be in the format HH:mm",
     });
 
+  private static createdBy = joi
+    .string()
+    .regex(/^[0-9a-fA-F]{24}$/)
+    .messages({
+      "string.empty": "CreatedBy must not be empty",
+      "string.pattern.base": "CreatedBy must be a valid ObjectId",
+    });
+
+
   public static create = joi.object({
     user: this.user.required(),
     date: this.date.required(),
     startTime: this.time.required(),
     endTime: this.time.required(),
+    createdBy: this.createdBy.required()
   });
+
 
   public static update = joi.object({
     user: this.user.optional(),
     date: this.date.optional(),
     startTime: this.time.optional(),
     endTime: this.time.optional(),
+    createdBy: this.createdBy.optional()
   });
 }

@@ -24,36 +24,48 @@ class BookingController {
     }
   }
 
-  public async getBookingById(req: Request, res: Response): Promise<any> {
-    const { id } = req.params;
-    const booking = await bookingService.getBookingById(id);
-    if (!booking) {
-      res.status(404).json({ message: "Booking not found." });
-    } else {
-      res.json(booking);
+  public async getBookingById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const booking = await bookingService.getBookingById(id);
+      if (!booking) {
+        res.status(404).json({ message: "Booking not found." });
+      } else {
+        res.status(200).json(BookingPresenter.bookingToResponse(booking));
+      }
+    } catch (error) {
+      next(error);
     }
   }
 
-  public async createBooking(req: Request, res: Response): Promise<any> {
+  public async createBooking(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const body = req.body as Partial<IBooking>;
+
       const booking = await bookingService.createBooking(body);
-      res.status(201).json(booking);
+
+      res.status(201).json(BookingPresenter.bookingToResponse(booking));
     } catch (error: any) {
-      res.status(400).json({ message: error.message });
+      if (error.name === "ValidationError") {
+        res.status(400).json({ message: error.message });
+      } else {
+        next(error);
+      }
     }
   }
-  public async updateBooking(req: Request, res: Response, next: NextFunction) {
+  public async updateBooking(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const id = req.params.id;
-
+      const { id } = req.params;
       const body = req.body as Partial<IBooking>;
+      const updatedBooking = await bookingService.updateBooking(id, body);
 
-      const user = await bookingService.updateBooking(id, body);
-
-      res.status(201).json(user);
-    } catch (e) {
-      next(e);
+      if (!updatedBooking) {
+        res.status(404).json({ message: "Booking not found." });
+      } else {
+        res.status(200).json(BookingPresenter.bookingToResponse(updatedBooking));
+      }
+    } catch (error) {
+      next(error);
     }
   }
   public async deleteBooking(req: Request, res: Response) {

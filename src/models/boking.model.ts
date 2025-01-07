@@ -8,6 +8,11 @@ const bookingSchema = new Schema<IBooking>(
       required: true,
       trim: true,
     },
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     date: {
       type: Date,
       required: true,
@@ -15,17 +20,17 @@ const bookingSchema = new Schema<IBooking>(
     startTime: {
       type: String,
       required: true,
-      match: /^\d{2}:\d{2}$/,
+      match: /^\d{2}:\d{2}$/, // Формат hh:mm
     },
     endTime: {
       type: String,
       required: true,
-      match: /^\d{2}:\d{2}$/,
+      match: /^\d{2}:\d{2}$/, // Формат hh:mm
     },
   },
   {
     timestamps: true,
-  },
+  }
 );
 
 bookingSchema.index({ date: 1, startTime: 1, endTime: 1 }, { unique: true });

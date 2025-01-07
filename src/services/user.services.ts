@@ -31,7 +31,7 @@ class UserService {
     return user;
   }
 
-  public async getMe(jwtPayload: ITokenPayload): Promise<IUser> {
+  public async getMe(jwtPayload: ITokenPayload): Promise<any> {
     const user = await userRepository.getById(jwtPayload.userId.toString());
     if (!user) {
       throw new ApiError("You cant get this user", 403);

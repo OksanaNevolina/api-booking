@@ -8,7 +8,7 @@ import { UserPresenter } from "../presenters/user.presenter";
 
 class UserController {
 
-  public async getMe(req: Request, res: Response, next: NextFunction) {
+  public async getMe(req: Request, res: Response, next: NextFunction): Promise<any> {
     try {
       const jwtPayload = req.res.locals.jwtPayload as ITokenPayload;
 
